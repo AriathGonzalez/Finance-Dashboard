@@ -1,7 +1,6 @@
-
 "use client";
 
-import { useState, useTransition } from 'react';
+import { useState, useEffect, useTransition } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -24,6 +23,31 @@ interface ConnectionDetails {
   // Password and API key are not stored or displayed for security, handled server-side
 }
 
+const FormCardSkeleton = () => (
+  <Card className="shadow-lg">
+    <CardHeader>
+      <Skeleton className="h-6 w-3/4 mb-2" /> {/* CardTitle */}
+      <Skeleton className="h-4 w-full" /> {/* CardDescription */}
+    </CardHeader>
+    <CardContent className="space-y-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-10 w-full" />
+      </div>
+      <Skeleton className="h-10 w-full" />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Skeleton className="h-10 w-full" />
+        <Skeleton className="h-10 w-full" />
+      </div>
+      <Skeleton className="h-10 w-full" />
+    </CardContent>
+    <CardFooter className="flex justify-end">
+      <Skeleton className="h-10 w-32" /> {/* Button */}
+    </CardFooter>
+  </Card>
+);
+
+
 export function ExternalDataConnectionsSection() {
   const [systemType, setSystemType] = useState<SystemType | undefined>(undefined);
   const [apiEndpoint, setApiEndpoint] = useState('');
@@ -35,7 +59,12 @@ export function ExternalDataConnectionsSection() {
   const [connections, setConnections] = useState<ConnectionDetails[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [isClient, setIsClient] = useState(false);
   const { toast } = useToast();
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -52,7 +81,7 @@ export function ExternalDataConnectionsSection() {
       return;
     }
     if (!apiEndpoint.trim()) {
-      setError("API Endpoint/Connection String is required.");
+      setError("API Endpoint / Connection String is required.");
       toast({ title: "Error", description: "API Endpoint is required.", variant: "destructive" });
       return;
     }
@@ -102,120 +131,124 @@ export function ExternalDataConnectionsSection() {
       <h2 id="external-data-title" className="text-2xl font-semibold mb-4 text-foreground flex items-center">
         <Link2 className="mr-2 h-6 w-6 text-primary" /> External Data Connections
       </h2>
-      <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
-        <CardHeader>
-          <CardTitle>Add New Data Source</CardTitle>
-          <CardDescription>
-            Configure connections to external financial systems like Skyward, SAP, or Munis.
-          </CardDescription>
-        </CardHeader>
-        <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="systemType">System Type</Label>
-                <Select 
-                  value={systemType} 
-                  onValueChange={(value: SystemType) => setSystemType(value)}
-                  disabled={isPending}
-                >
-                  <SelectTrigger id="systemType">
-                    <SelectValue placeholder="Select system" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="skyward">Skyward</SelectItem>
-                    <SelectItem value="sap">SAP</SelectItem>
-                    <SelectItem value="munis">Munis</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              {systemType === "other" && (
+      
+      {isClient ? (
+        <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
+          <CardHeader>
+            <CardTitle>Add New Data Source</CardTitle>
+            <CardDescription>
+              Configure connections to external financial systems like Skyward, SAP, or Munis.
+            </CardDescription>
+          </CardHeader>
+          <form onSubmit={handleSubmit}>
+            <CardContent className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <Label htmlFor="customSystemName">System Name (if Other)</Label>
-                    <Input
-                    id="customSystemName"
-                    type="text"
-                    value={customSystemName}
-                    onChange={(e) => setCustomSystemName(e.target.value)}
-                    placeholder="e.g., Custom ERP"
+                  <Label htmlFor="systemType">System Type</Label>
+                  <Select 
+                    value={systemType} 
+                    onValueChange={(value: SystemType) => setSystemType(value)}
                     disabled={isPending}
-                    />
+                  >
+                    <SelectTrigger id="systemType">
+                      <SelectValue placeholder="Select system" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="skyward">Skyward</SelectItem>
+                      <SelectItem value="sap">SAP</SelectItem>
+                      <SelectItem value="munis">Munis</SelectItem>
+                      <SelectItem value="other">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
-                )}
-            </div>
-            
-            <div>
-              <Label htmlFor="apiEndpoint">API Endpoint / Connection String</Label>
-              <Input
-                id="apiEndpoint"
-                type="text"
-                value={apiEndpoint}
-                onChange={(e) => setApiEndpoint(e.target.value)}
-                placeholder="e.g., https://api.example.com/v1"
-                disabled={isPending}
-              />
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {systemType === "other" && (
+                  <div>
+                      <Label htmlFor="customSystemName">System Name (if Other)</Label>
+                      <Input
+                      id="customSystemName"
+                      type="text"
+                      value={customSystemName}
+                      onChange={(e) => setCustomSystemName(e.target.value)}
+                      placeholder="e.g., Custom ERP"
+                      disabled={isPending}
+                      />
+                  </div>
+                  )}
+              </div>
+              
               <div>
-                <Label htmlFor="username">Username</Label>
+                <Label htmlFor="apiEndpoint">API Endpoint / Connection String</Label>
                 <Input
-                  id="username"
+                  id="apiEndpoint"
                   type="text"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder="Enter username"
+                  value={apiEndpoint}
+                  onChange={(e) => setApiEndpoint(e.target.value)}
+                  placeholder="e.g., https://api.example.com/v1"
                   disabled={isPending}
                 />
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                  <Label htmlFor="username">Username</Label>
+                  <Input
+                    id="username"
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="Enter username"
+                    disabled={isPending}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="password">Password</Label>
+                  <Input
+                    id="password"
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Enter password"
+                    disabled={isPending}
+                  />
+                </div>
               </div>
               <div>
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="apiKey">API Key / Token (Optional)</Label>
                 <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Enter password"
+                  id="apiKey"
+                  type="text"
+                  value={apiKey}
+                  onChange={(e) => setApiKey(e.target.value)}
+                  placeholder="Enter API key or token if required"
                   disabled={isPending}
                 />
               </div>
-            </div>
-            <div>
-              <Label htmlFor="apiKey">API Key / Token (Optional)</Label>
-              <Input
-                id="apiKey"
-                type="text"
-                value={apiKey}
-                onChange={(e) => setApiKey(e.target.value)}
-                placeholder="Enter API key or token if required"
-                disabled={isPending}
-              />
-            </div>
-            {error && (
-              <Alert variant="destructive">
-                <AlertTriangle className="h-4 w-4" />
-                <AlertTitle>Error</AlertTitle>
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-          </CardContent>
-          <CardFooter className="flex justify-end">
-            <Button type="submit" disabled={isPending}>
-              {isPending ? (
-                <>
-                  <Save className="mr-2 h-4 w-4 animate-spin" />
-                  Saving...
-                </>
-              ) : (
-                <>
-                  <PlusCircle className="mr-2 h-4 w-4" />
-                  Add Connection
-                </>
+              {error && (
+                <Alert variant="destructive">
+                  <AlertTriangle className="h-4 w-4" />
+                  <AlertTitle>Error</AlertTitle>
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
               )}
-            </Button>
-          </CardFooter>
-        </form>
-      </Card>
+            </CardContent>
+            <CardFooter className="flex justify-end">
+              <Button type="submit" disabled={isPending}>
+                {isPending ? (
+                  <>
+                    <Save className="mr-2 h-4 w-4 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    Add Connection
+                  </>
+                )}
+              </Button>
+            </CardFooter>
+          </form>
+        </Card>
+      ) : <FormCardSkeleton /> }
+
 
       {isPending && !connections.length && (
         <Card className="mt-6">
