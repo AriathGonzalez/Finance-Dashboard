@@ -1,7 +1,6 @@
-"use client";
+'use client';
 
-import { useState, useTransition } from 'react';
-import { sqlQueryChatbot } from '@/ai/flows/sql-query-chatbot';
+import { useState, useEffect, useTransition } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -9,6 +8,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { MessageCircle, Terminal, AlertTriangle, Sparkles } from 'lucide-react';
 import { useToast } from "@/hooks/use-toast";
 import { Label } from '../ui/label';
+import { v4 as uuidv4 } from 'uuid';
 
 export function SqlChatbotSection() {
   const [question, setQuestion] = useState('');
@@ -16,26 +16,53 @@ export function SqlChatbotSection() {
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const { toast } = useToast();
+  const [userId, setUserId] = useState('');
+
+  // Generate/store user ID on mount
+  useEffect(() => {
+    let storedId = localStorage.getItem('user_id');
+    if (!storedId) {
+      storedId = uuidv4();
+      localStorage.setItem('user_id', storedId);
+    }
+    setUserId(storedId);
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setSqlQuery('');
+
     startTransition(async () => {
+      if (!question.trim()) {
+        setError('Question cannot be empty.');
+        toast({ title: 'Error', description: 'Please enter a question.', variant: 'destructive' });
+        return;
+      }
+
       try {
-        if (!question.trim()) {
-          setError("Question cannot be empty.");
-          toast({ title: "Error", description: "Please enter a question.", variant: "destructive" });
-          return;
+        const res = await fetch('http://localhost:3000/search', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ query: question, user: userId })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.error || 'Unknown error from server');
         }
-        const result = await sqlQueryChatbot({ question });
-        setSqlQuery(result.sqlQuery);
-        toast({ title: "SQL Query Generated", description: "AI successfully generated the SQL query.", className: "bg-green-500 text-white" });
-      } catch (e) {
-        console.error("Error fetching SQL query:", e);
-        const errorMessage = e instanceof Error ? e.message : "An unexpected error occurred.";
-        setError(errorMessage);
-        toast({ title: "Error", description: `Failed to generate SQL query: ${errorMessage}`, variant: "destructive" });
+
+        setSqlQuery(data.answer || 'No SQL query returned.');
+        toast({
+          title: 'Success',
+          description: 'SQL query generated successfully!',
+          className: 'bg-green-500 text-white'
+        });
+      } catch (err: any) {
+        console.error('Error:', err.message);
+        setError(err.message);
+        toast({ title: 'Error', description: err.message, variant: 'destructive' });
       }
     });
   };
