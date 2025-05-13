@@ -1,3 +1,4 @@
+
 "use client"
 import type { PropsWithChildren } from 'react';
 import {
@@ -13,7 +14,7 @@ import {
   SidebarTrigger,
 } from '@/components/ui/sidebar';
 import { AppLogo } from '@/components/layout/app-logo';
-import { LayoutDashboard, Settings, FileText } from 'lucide-react';
+import { LayoutDashboard, Settings, FileText, Link2 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -39,6 +40,12 @@ export function MainLayout({ children }: PropsWithChildren) {
               <SidebarMenuButton href="#" isActive tooltip="Dashboard">
                 <LayoutDashboard />
                 Dashboard
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton href="#" tooltip="Data Connections">
+                <Link2 />
+                Data Connections
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>

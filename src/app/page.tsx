@@ -4,6 +4,7 @@ import { ChartsSection } from '@/components/dashboard/charts-section';
 import { AiInsightsSection } from '@/components/dashboard/ai-insights-section';
 import { SqlChatbotSection } from '@/components/dashboard/sql-chatbot-section';
 import { SummaryExportSection } from '@/components/dashboard/summary-export-section';
+import { ExternalDataConnectionsSection } from '@/components/dashboard/external-data-connections-section';
 import { Separator } from '@/components/ui/separator';
 
 export default function DashboardPage() {
@@ -17,6 +18,8 @@ export default function DashboardPage() {
         <AiInsightsSection />
         <Separator />
         <SqlChatbotSection />
+        <Separator />
+        <ExternalDataConnectionsSection />
         <Separator />
         <SummaryExportSection />
       </div>

@@ -32,7 +32,7 @@ export function SqlChatbotSection() {
     e.preventDefault();
     setError(null);
     setSqlQuery('');
-
+    console.log("Yo, did you get this question? ", question)
     startTransition(async () => {
       if (!question.trim()) {
         setError('Question cannot be empty.');
@@ -41,12 +41,13 @@ export function SqlChatbotSection() {
       }
 
       try {
-        const res = await fetch('http://localhost:3000/search', {
+        console.log("query was: ", question, " for user: ", userId)
+        const res = await fetch('http://localhost:3001/search', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ query: question, user: userId })
         });
-
+        console.log(res);
         const data = await res.json();
 
         if (!res.ok) {

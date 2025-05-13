@@ -6,7 +6,7 @@ require('dotenv').config();
 
 router.post('/search', async (req, res) => {
   const { query, user } = req.body;
-
+  console.log("query: ", query, " user: ", user)
   if (!query || !user) {
     return res.status(400).json({ error: 'Query and user are required.' });
   }
