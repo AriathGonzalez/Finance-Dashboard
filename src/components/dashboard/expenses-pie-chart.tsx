@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Pie, PieChart, Tooltip, Legend, Cell } from "recharts";
@@ -12,7 +13,7 @@ import {
 import {
   ChartContainer,
   ChartTooltipContent,
-  ChartLegendContent,
+  ChartLegendContent, // Added import
 } from "@/components/ui/chart";
 import type { ChartConfig } from "@/components/ui/chart";
 import { useEffect, useState, forwardRef } from "react";
@@ -67,13 +68,14 @@ const chartConfig = {
   },
   suppliesMaterials: {
     label: "Supplies & Materials",
-    color: "hsl(var(--chart-4))",
+    color: "hsl(var(--chart-5))", // Corrected from chart-4 to chart-5 for uniqueness if desired, or ensure chart-4 is distinct
   },
   capitalOutlay: {
     label: "Capital Outlay",
-    color: "hsl(var(--chart-5))",
+    color: "hsl(var(--chart-1))", // Re-using chart-1, consider using a new var if more unique colors are needed
   },
 } satisfies ChartConfig;
+
 
 const months = [
   { value: 1, label: "January" },
@@ -104,7 +106,7 @@ export const ExpensesPieChart = forwardRef<HTMLDivElement>((_, ref) => {
     setIsClient(true);
     const currentDate = new Date();
     setSelectedMonth(getMonth(currentDate) + 1); // date-fns getMonth is 0-indexed
-    setSelectedYear(2023);
+    setSelectedYear(getYear(currentDate)); // Use current year by default
   }, []);
 
   useEffect(() => {
@@ -146,8 +148,10 @@ export const ExpensesPieChart = forwardRef<HTMLDivElement>((_, ref) => {
                 `Failed to fetch ${endpoints[index]}:`,
                 errorData.message || errorData.error
               );
+              // Ensure the key matches one of the expected keys in categoryConfigKeys
+              const errorCategoryKey = Object.keys(chartConfig)[index + 1] as (typeof categoryConfigKeys)[number];
               return {
-                [Object.keys(chartConfig)[index + 1]]: [{ total_expenses: 0 }],
+                [errorCategoryKey]: [{ total_expenses: 0 }],
               };
             }
             return res.json();
@@ -156,7 +160,7 @@ export const ExpensesPieChart = forwardRef<HTMLDivElement>((_, ref) => {
 
         const pieData = results.map((res, index) => {
           const categoryKey = categoryConfigKeys[index];
-          const responseKey = Object.keys(res)[0];
+          const responseKey = Object.keys(res)[0]; // e.g., "expenses", "other_expenses"
           const totalExpenses = Math.abs(
             parseFloat(res?.[responseKey]?.[0]?.total_expenses ?? 0)
           );
@@ -268,7 +272,8 @@ export const ExpensesPieChart = forwardRef<HTMLDivElement>((_, ref) => {
                     <ChartTooltipContent
                       hideLabel
                       formatter={(value, name, props) => {
-                        const originalItem = props.payload as any;
+                        // Access the original category name from the payload
+                        const originalItem = props.payload as any; 
                         return `${originalItem.category}: $${(
                           value as number
                         ).toLocaleString()}`;
@@ -279,7 +284,7 @@ export const ExpensesPieChart = forwardRef<HTMLDivElement>((_, ref) => {
                 <Pie
                   data={chartData}
                   dataKey="expenses"
-                  nameKey="category"
+                  nameKey="category" // This key is used by ChartLegendContent
                   cx="50%"
                   cy="50%"
                   innerRadius={60}
@@ -291,7 +296,7 @@ export const ExpensesPieChart = forwardRef<HTMLDivElement>((_, ref) => {
                     <Cell
                       key={`cell-${index}`}
                       fill={entry.fill}
-                      name={entry.category}
+                      name={entry.category} // Pass the category name for the tooltip
                     />
                   ))}
                 </Pie>
@@ -304,3 +309,6 @@ export const ExpensesPieChart = forwardRef<HTMLDivElement>((_, ref) => {
     </div>
   );
 });
+
+ExpensesPieChart.displayName = "ExpensesPieChart";
+
