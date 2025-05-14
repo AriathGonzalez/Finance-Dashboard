@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -41,13 +42,23 @@ export function SummaryExportSection() {
 
       container.style.padding = "20px"; // Add some padding for better PDF appearance
       container.style.background = "white"; // Ensure a background for the canvas
+      
       container.appendChild(clonedOverview);
-      // Add some space between overview and chart
-      const spacer = document.createElement("div");
-      spacer.style.height = "20px";
-      container.appendChild(spacer);
+      
+      // Add some space between overview and revenue chart
+      const spacer1 = document.createElement("div");
+      spacer1.style.height = "20px";
+      container.appendChild(spacer1);
+      
       container.appendChild(clonedChart);
+
+      // Add space between revenue chart and expenses chart
+      const spacer2 = document.createElement("div");
+      spacer2.style.height = "20px";
+      container.appendChild(spacer2);
+      
       container.appendChild(clonedExpenses);
+      
       // Temporarily append to body to ensure rendering if needed, then remove
       document.body.appendChild(container);
 
