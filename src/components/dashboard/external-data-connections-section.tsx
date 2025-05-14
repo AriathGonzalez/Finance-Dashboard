@@ -1,16 +1,33 @@
 "use client";
 
-import { useState, useEffect, useTransition } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useState, useEffect, useTransition } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { DatabaseZap, Link2, PlusCircle, Save } from 'lucide-react';
-import { Skeleton } from '@/components/ui/skeleton';
+import {
+  DatabaseZap,
+  Link2,
+  PlusCircle,
+  Save,
+  AlertTriangle,
+} from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertTriangle } from 'lucide-react';
 
 type SystemType = "skyward" | "sap" | "munis" | "other";
 
@@ -47,14 +64,15 @@ const FormCardSkeleton = () => (
   </Card>
 );
 
-
 export function ExternalDataConnectionsSection() {
-  const [systemType, setSystemType] = useState<SystemType | undefined>(undefined);
-  const [apiEndpoint, setApiEndpoint] = useState('');
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [apiKey, setApiKey] = useState('');
-  const [customSystemName, setCustomSystemName] = useState(''); 
+  const [systemType, setSystemType] = useState<SystemType | undefined>(
+    undefined
+  );
+  const [apiEndpoint, setApiEndpoint] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [apiKey, setApiKey] = useState("");
+  const [customSystemName, setCustomSystemName] = useState("");
 
   const [connections, setConnections] = useState<ConnectionDetails[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -72,81 +90,105 @@ export function ExternalDataConnectionsSection() {
 
     if (!systemType) {
       setError("Please select a system type.");
-      toast({ title: "Error", description: "System type is required.", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "System type is required.",
+        variant: "destructive",
+      });
       return;
     }
     if (systemType === "other" && !customSystemName.trim()) {
       setError("Please specify the system name for 'Other'.");
-      toast({ title: "Error", description: "System name is required for 'Other'.", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "System name is required for 'Other'.",
+        variant: "destructive",
+      });
       return;
     }
     if (!apiEndpoint.trim()) {
       setError("API Endpoint / Connection String is required.");
-      toast({ title: "Error", description: "API Endpoint is required.", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "API Endpoint is required.",
+        variant: "destructive",
+      });
       return;
     }
-     if (!username.trim()) {
+    if (!username.trim()) {
       setError("Username is required.");
-      toast({ title: "Error", description: "Username is required.", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "Username is required.",
+        variant: "destructive",
+      });
       return;
     }
     if (!password.trim()) {
       setError("Password is required.");
-      toast({ title: "Error", description: "Password is required.", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "Password is required.",
+        variant: "destructive",
+      });
       return;
     }
 
     startTransition(async () => {
       // Mock API call to save connection
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       const newConnection: ConnectionDetails = {
         id: Date.now().toString(),
         systemType,
-        systemName: systemType === "other" ? customSystemName : systemType.charAt(0).toUpperCase() + systemType.slice(1),
+        systemName:
+          systemType === "other"
+            ? customSystemName
+            : systemType.charAt(0).toUpperCase() + systemType.slice(1),
         apiEndpoint,
         username,
       };
-      
-      setConnections(prev => [...prev, newConnection]);
-      
+
+      setConnections((prev) => [...prev, newConnection]);
+
       toast({
         title: "Connection Saved (Mock)",
         description: `Connection to ${newConnection.systemName} configured. In a real app, this would be securely stored.`,
-        className: "bg-green-500 text-white"
+        className: "bg-green-500 text-white",
       });
 
       // Reset form
       setSystemType(undefined);
-      setApiEndpoint('');
-      setUsername('');
-      setPassword('');
-      setApiKey('');
-      setCustomSystemName('');
+      setApiEndpoint("");
+      setUsername("");
+      setPassword("");
+      setApiKey("");
+      setCustomSystemName("");
     });
   };
 
   return (
     <section aria-labelledby="external-data-title" className="mt-8">
-      <h2 id="external-data-title" className="text-2xl font-semibold mb-4 text-foreground flex items-center">
-        <Link2 className="mr-2 h-6 w-6 text-primary" /> External Data Connections
+      <h2
+        id="external-data-title"
+        className="text-2xl font-semibold mb-4 text-foreground flex items-center"
+      >
+        <Link2 className="mr-2 h-6 w-6 text-primary" /> External Data
+        Connections
       </h2>
-      
+
       {isClient ? (
         <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
           <CardHeader>
             <CardTitle>Add New Data Source</CardTitle>
-            <CardDescription>
-              Configure connections to external financial systems like Skyward, SAP, or Munis.
-            </CardDescription>
           </CardHeader>
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="systemType">System Type</Label>
-                  <Select 
-                    value={systemType} 
+                  <Select
+                    value={systemType}
                     onValueChange={(value: SystemType) => setSystemType(value)}
                     disabled={isPending}
                   >
@@ -163,21 +205,25 @@ export function ExternalDataConnectionsSection() {
                 </div>
                 {systemType === "other" && (
                   <div>
-                      <Label htmlFor="customSystemName">System Name (if Other)</Label>
-                      <Input
+                    <Label htmlFor="customSystemName">
+                      System Name (if Other)
+                    </Label>
+                    <Input
                       id="customSystemName"
                       type="text"
                       value={customSystemName}
                       onChange={(e) => setCustomSystemName(e.target.value)}
                       placeholder="e.g., Custom ERP"
                       disabled={isPending}
-                      />
+                    />
                   </div>
-                  )}
+                )}
               </div>
-              
+
               <div>
-                <Label htmlFor="apiEndpoint">API Endpoint / Connection String</Label>
+                <Label htmlFor="apiEndpoint">
+                  API Endpoint / Connection String
+                </Label>
                 <Input
                   id="apiEndpoint"
                   type="text"
@@ -247,8 +293,9 @@ export function ExternalDataConnectionsSection() {
             </CardFooter>
           </form>
         </Card>
-      ) : <FormCardSkeleton /> }
-
+      ) : (
+        <FormCardSkeleton />
+      )}
 
       {isPending && !connections.length && (
         <Card className="mt-6">
@@ -269,16 +316,21 @@ export function ExternalDataConnectionsSection() {
           </CardHeader>
           <CardContent>
             <ul className="space-y-3">
-              {connections.map(conn => (
-                <li key={conn.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-md">
+              {connections.map((conn) => (
+                <li
+                  key={conn.id}
+                  className="flex items-center justify-between p-3 bg-muted/50 rounded-md"
+                >
                   <div className="flex items-center">
                     <DatabaseZap className="h-5 w-5 mr-3 text-primary" />
                     <div>
                       <p className="font-medium">{conn.systemName}</p>
-                      <p className="text-xs text-muted-foreground">{conn.apiEndpoint}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {conn.apiEndpoint}
+                      </p>
                     </div>
                   </div>
-                   {/* Actions like Edit/Delete would go here in a real app */}
+                  {/* Actions like Edit/Delete would go here in a real app */}
                 </li>
               ))}
             </ul>
