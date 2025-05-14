@@ -28,7 +28,7 @@ export function SummaryExportSection() {
     const chartElement = chartRef.current;
     const expensesElement = expensesRef.current;
 
-    if (!overviewElement || !chartElement) {
+    if (!overviewElement || !chartElement || !expensesElement) {
       toast({ title: "Error", description: "Content not ready for export." });
       return;
     }
@@ -37,6 +37,7 @@ export function SummaryExportSection() {
       const container = document.createElement("div");
       const clonedOverview = overviewElement.cloneNode(true) as HTMLElement;
       const clonedChart = chartElement.cloneNode(true) as HTMLElement;
+      const clonedExpenses = expensesElement.cloneNode(true) as HTMLElement;
 
       container.style.padding = "20px"; // Add some padding for better PDF appearance
       container.style.background = "white"; // Ensure a background for the canvas
@@ -46,7 +47,7 @@ export function SummaryExportSection() {
       spacer.style.height = "20px";
       container.appendChild(spacer);
       container.appendChild(clonedChart);
-
+      container.appendChild(clonedExpenses);
       // Temporarily append to body to ensure rendering if needed, then remove
       document.body.appendChild(container);
 
