@@ -1,6 +1,7 @@
 "use client"
 
 import { Pie, PieChart, Tooltip, Legend } from "recharts"
+import { PieChartIcon } from "lucide-react"
 import {
   Card,
   CardContent,
@@ -53,7 +54,10 @@ export function ExpensesPieChart() {
   return (
     <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
       <CardHeader>
-        <CardTitle>Expense Categories</CardTitle>
+        <CardTitle className="flex items-center">
+          <PieChartIcon className="mr-2 h-5 w-5 text-primary" />
+          Expense Categories
+        </CardTitle>
         <CardDescription>Current Month</CardDescription>
       </CardHeader>
       <CardContent className="flex items-center justify-center">
