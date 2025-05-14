@@ -20,7 +20,7 @@ import { useEffect, useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { format, getMonth, getYear } from "date-fns";
+import { getMonth, getYear } from "date-fns"; // Removed 'format' as it's not used
 
 const categoryLabels = [
   "Payroll",
@@ -38,7 +38,7 @@ const categoryConfigKeys = [
   "debtServices",
   "suppliesMaterials",
   "capitalOutlay",
-];
+] as const; // Added 'as const'
 
 const chartConfig = {
   expenses: {
@@ -62,7 +62,7 @@ const chartConfig = {
   },
   suppliesMaterials: {
     label: "Supplies & Materials",
-    color: "hsl(var(--chart-4))", // Corrected typo from hs1 to hsl
+    color: "hsl(var(--chart-4))",
   },
   capitalOutlay: {
     label: "Capital Outlay",
@@ -119,26 +119,24 @@ export function ExpensesPieChart() {
           if (!res.ok) {
             const errorData = await res.json().catch(() => ({ message: `HTTP error ${res.status} for ${endpoints[index]}`}));
             console.error(`Failed to fetch ${endpoints[index]}:`, errorData.message || errorData.error);
-            return { [Object.keys(chartConfig)[index+1]]: [{ total_expenses: 0 }] }; // Default to 0 on error for this category
+            return { [Object.keys(chartConfig)[index+1]]: [{ total_expenses: 0 }] }; 
           }
           return res.json();
         }));
         
         const pieData = results.map((res, index) => {
-          const categoryKey = categoryConfigKeys[index];
-          // The API returns an object where the key is dynamic e.g. { expenses: [{...}] } or { other_expenses: [{...}] }
-          // We need to access the first key of the response object to get to the array, then the total_expenses.
+          const categoryKey = categoryConfigKeys[index]; 
           const responseKey = Object.keys(res)[0];
           const totalExpenses = Math.abs(parseFloat(res?.[responseKey]?.[0]?.total_expenses ?? 0));
           
           return {
             category: categoryLabels[index],
             expenses: totalExpenses,
-            fill: chartConfig[categoryKey as keyof typeof chartConfig]?.color || "hsl(var(--muted))",
+            fill: chartConfig[categoryKey]?.color || "hsl(var(--muted))",
           };
         });
 
-        setChartData(pieData.filter(item => item.expenses > 0)); // Only show categories with expenses
+        setChartData(pieData.filter(item => item.expenses > 0)); 
       } catch (err: any) {
         console.error("Failed to fetch expense data:", err);
         setError(err.message || "An unexpected error occurred while fetching expense data.");
@@ -194,8 +192,8 @@ export function ExpensesPieChart() {
                 onChange={(e) => setSelectedYear(parseInt(e.target.value))}
                 placeholder="Year"
                 disabled={isLoading}
-                min="2000" // Example min year
-                max={new Date().getFullYear() + 5} // Example max year
+                min="2000" 
+                max={new Date().getFullYear() + 5} 
               />
             </div>
           </div>
@@ -219,7 +217,6 @@ export function ExpensesPieChart() {
                   <ChartTooltipContent
                     hideLabel
                     formatter={(value, name, props) => {
-                       // props.payload contains the original data item including 'category' and 'fill'
                        const originalItem = props.payload as any;
                        return `${originalItem.category}: $${(value as number).toLocaleString()}`;
                     }}
@@ -229,7 +226,7 @@ export function ExpensesPieChart() {
               <Pie
                 data={chartData}
                 dataKey="expenses"
-                nameKey="category" // This refers to the 'category' field in chartData for labels
+                nameKey="category" 
                 cx="50%"
                 cy="50%"
                 innerRadius={60}
