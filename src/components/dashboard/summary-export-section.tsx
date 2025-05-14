@@ -1,3 +1,4 @@
+
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -22,26 +23,71 @@ export function SummaryExportSection() {
   const overviewRef = useRef<HTMLDivElement>(null);
 
   const handleExport = async () => {
-    if (!chartRef.current) return;
+    const overviewElement = overviewRef.current;
+    const chartElement = chartRef.current;
 
+    if (!overviewElement || !chartElement) {
+      toast({ title: "Error", description: "Content not ready for export." });
+      return;
+    }
+    
     try {
-      const canvas = await html2canvas(chartRef.current, { scale: 2 });
+      // Create a container to hold both elements for combined canvas capture
+      const container = document.createElement("div");
+      // Clone elements to avoid manipulating live DOM directly in a way that might affect display before capture
+      const clonedOverview = overviewElement.cloneNode(true) as HTMLElement;
+      const clonedChart = chartElement.cloneNode(true) as HTMLElement;
+
+      // Style the container and cloned elements as needed for PDF layout
+      // For simplicity, we'll just append them one after another.
+      // Ensure elements are visible for html2canvas to capture them.
+      // This might require appending to document.body temporarily if elements are complex or hidden.
+      // However, for visible elements, direct cloning and appending to a temporary div is often sufficient.
+      
+      container.style.padding = "20px"; // Add some padding for better PDF appearance
+      container.style.background = "white"; // Ensure a background for the canvas
+      container.appendChild(clonedOverview);
+      // Add some space between overview and chart
+      const spacer = document.createElement("div");
+      spacer.style.height = "20px";
+      container.appendChild(spacer);
+      container.appendChild(clonedChart);
+      
+      // Temporarily append to body to ensure rendering if needed, then remove
+      document.body.appendChild(container);
+
+
+      const canvas = await html2canvas(container, { scale: 2, useCORS: true, allowTaint: true });
+      document.body.removeChild(container); // Clean up the temporary container
+
       const imgData = canvas.toDataURL("image/png");
 
       const pdf = new jsPDF("p", "mm", "a4");
-      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
       const imgProps = pdf.getImageProperties(imgData);
-      const pdfHeight = (imgProps.height * pageWidth) / imgProps.width;
+      const imgWidth = imgProps.width;
+      const imgHeight = imgProps.height;
 
-      pdf.addImage(imgData, "PNG", 0, 10, pageWidth, pdfHeight);
+      // Calculate aspect ratio to fit image into PDF page
+      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+      const newImgWidth = imgWidth * ratio;
+      const newImgHeight = imgHeight * ratio;
+      
+      // Center the image on the PDF page (optional)
+      const xOffset = (pdfWidth - newImgWidth) / 2;
+      const yOffset = 10; // Add some margin from top
+
+      pdf.addImage(imgData, "PNG", xOffset, yOffset, newImgWidth, newImgHeight);
       pdf.save("board-summary.pdf");
 
       toast({
         title: "PDF Exported",
         description: "The summary has been downloaded.",
+        className: "bg-green-500 text-white",
       });
     } catch (error) {
-      toast({ title: "Error", description: "Failed to generate PDF." });
+      toast({ title: "Error", description: "Failed to generate PDF.", variant: "destructive" });
       console.error("PDF export error:", error);
     }
   };
@@ -63,7 +109,8 @@ export function SummaryExportSection() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="mb-4">
+          {/* Content to be exported */}
+          <div className="flex flex-col gap-6 mb-6">
             <OverviewSection ref={overviewRef} />
             <RevenueChart ref={chartRef} />
           </div>
