@@ -1,3 +1,4 @@
+
 // routes/textToSql.js
 const express = require("express");
 const axios = require("axios");
@@ -18,7 +19,7 @@ router.post("/search", async (req, res) => {
         inputs: {},
         query,
         response_mode: "blocking",
-        conversation_id: "",
+        conversation_id: "", // Consider managing conversation_id for context
         user,
       },
       {
@@ -29,16 +30,19 @@ router.post("/search", async (req, res) => {
       }
     );
 
-    const answer = response.data?.answer;
+    const sqlQuery = response.data?.answer;
+    // Assuming dify.ai might return an explanation field.
+    // If not, this will be undefined, and the frontend should handle it.
+    const naturalLanguageExplanation = response.data?.explanation; 
 
-    if (!answer) {
-      return res.status(500).json({ error: "No answer received from Diffy." });
+    if (!sqlQuery) {
+      return res.status(500).json({ error: "No SQL query received from Diffy." });
     }
 
-    res.json({ answer });
+    res.json({ sqlQuery, naturalLanguageExplanation });
   } catch (err) {
-    console.error("Diffy API error:", err.message);
-    res.status(500).json({ error: "Failed to fetch SQL from Diffy." });
+    console.error("Diffy API error:", err.response ? err.response.data : err.message);
+    res.status(500).json({ error: "Failed to fetch data from Diffy AI." });
   }
 });
 
