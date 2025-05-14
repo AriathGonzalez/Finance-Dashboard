@@ -3,6 +3,7 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const searchRoute = require("./routes/search");
 const dataRoutes = require("./routes/data");
+const expensesRoutes = require("./routes/expenses");
 
 dotenv.config();
 const app = express();
@@ -20,6 +21,7 @@ app.use(
 app.use(express.json());
 app.use("/", searchRoute);
 app.use("/data", dataRoutes);
+app.use("/expenses", expensesRoutes);
 
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
