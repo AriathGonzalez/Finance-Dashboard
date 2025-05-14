@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -16,34 +15,29 @@ import jsPDF from "jspdf";
 import { useRef } from "react";
 import { RevenueChart } from "./revenue-chart";
 import { OverviewSection } from "./overview-section";
+import { ExpensesPieChart } from "./expenses-pie-chart";
 
 export function SummaryExportSection() {
   const { toast } = useToast();
   const chartRef = useRef<HTMLDivElement>(null);
   const overviewRef = useRef<HTMLDivElement>(null);
+  const expensesRef = useRef<HTMLDivElement>(null);
 
   const handleExport = async () => {
     const overviewElement = overviewRef.current;
     const chartElement = chartRef.current;
+    const expensesElement = expensesRef.current;
 
     if (!overviewElement || !chartElement) {
       toast({ title: "Error", description: "Content not ready for export." });
       return;
     }
-    
+
     try {
-      // Create a container to hold both elements for combined canvas capture
       const container = document.createElement("div");
-      // Clone elements to avoid manipulating live DOM directly in a way that might affect display before capture
       const clonedOverview = overviewElement.cloneNode(true) as HTMLElement;
       const clonedChart = chartElement.cloneNode(true) as HTMLElement;
 
-      // Style the container and cloned elements as needed for PDF layout
-      // For simplicity, we'll just append them one after another.
-      // Ensure elements are visible for html2canvas to capture them.
-      // This might require appending to document.body temporarily if elements are complex or hidden.
-      // However, for visible elements, direct cloning and appending to a temporary div is often sufficient.
-      
       container.style.padding = "20px"; // Add some padding for better PDF appearance
       container.style.background = "white"; // Ensure a background for the canvas
       container.appendChild(clonedOverview);
@@ -52,12 +46,15 @@ export function SummaryExportSection() {
       spacer.style.height = "20px";
       container.appendChild(spacer);
       container.appendChild(clonedChart);
-      
+
       // Temporarily append to body to ensure rendering if needed, then remove
       document.body.appendChild(container);
 
-
-      const canvas = await html2canvas(container, { scale: 2, useCORS: true, allowTaint: true });
+      const canvas = await html2canvas(container, {
+        scale: 2,
+        useCORS: true,
+        allowTaint: true,
+      });
       document.body.removeChild(container); // Clean up the temporary container
 
       const imgData = canvas.toDataURL("image/png");
@@ -73,7 +70,7 @@ export function SummaryExportSection() {
       const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
       const newImgWidth = imgWidth * ratio;
       const newImgHeight = imgHeight * ratio;
-      
+
       // Center the image on the PDF page (optional)
       const xOffset = (pdfWidth - newImgWidth) / 2;
       const yOffset = 10; // Add some margin from top
@@ -87,7 +84,11 @@ export function SummaryExportSection() {
         className: "bg-green-500 text-white",
       });
     } catch (error) {
-      toast({ title: "Error", description: "Failed to generate PDF.", variant: "destructive" });
+      toast({
+        title: "Error",
+        description: "Failed to generate PDF.",
+        variant: "destructive",
+      });
       console.error("PDF export error:", error);
     }
   };
@@ -113,6 +114,7 @@ export function SummaryExportSection() {
           <div className="flex flex-col gap-6 mb-6">
             <OverviewSection ref={overviewRef} />
             <RevenueChart ref={chartRef} />
+            <ExpensesPieChart ref={expensesRef} />
           </div>
           <Button onClick={handleExport}>
             <FileDown className="mr-2 h-4 w-4" />
