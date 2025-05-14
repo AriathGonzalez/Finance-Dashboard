@@ -47,25 +47,35 @@ const budgetInsightsPrompt = ai.definePrompt({
   name: 'budgetInsightsPrompt',
   input: {schema: BudgetInsightsInputSchema},
   output: {schema: BudgetInsightsOutputSchema},
-  prompt: `You are a financial analyst expert. Analyze the provided financial data, current budget, and past financial data (if available) to identify potential budget risks and opportunities.
+  prompt: `You are an expert financial analyst AI. Your task is to meticulously analyze the provided financial data, current budget allocation, and any available past financial data.
+Your goal is to identify:
+1.  **Potential Budget Risks:** These could be areas of overspending, underperforming revenue streams, inefficient cost structures, or external factors suggested by the data. Be specific about why each item is a risk.
+2.  **Potential Budget Opportunities:** These could include areas for cost savings, high-performing revenue streams to invest more in, potential for new revenue generation, or efficiencies that can be gained. Explain the upside of each opportunity.
+3.  **Actionable Recommendations:** For each identified risk and opportunity, provide concrete, actionable recommendations for resource allocation. These should be specific (e.g., "Reallocate X% of marketing budget from Product C to Product A" rather than "Improve marketing"). Consider how the current budget could be adjusted.
+4.  **Concise Summary:** Provide an overall summary of the financial health and key takeaways from your analysis.
 
-Financial Data:
-{{financialData}}
+When analyzing, pay attention to:
+- Trends evident in the financial data (e.g., increasing/decreasing income or expenses, changes in proportions).
+- Discrepancies or alignments between the financial data (actuals/performance) and the current budget.
+- The potential impact and urgency of identified risks and opportunities.
 
-Current Budget:
-{{currentBudget}}
+Provided Data:
 
-Past Financial Data (Optional):
-{{#if pastFinancialData}}{{pastFinancialData}}{{else}}N/A{{/if}}
+Current Financial Data:
+{{{financialData}}}
 
-Based on your analysis, provide a list of potential risks, a list of potential opportunities, and specific recommendations for resource allocation to mitigate risks and leverage opportunities.  Also write a short summary.
+Current Budget Allocation:
+{{{currentBudget}}}
 
-Ensure the output is well-structured and easy to understand.
+{{#if pastFinancialData}}
+Past Financial Data (for trend analysis and comparison):
+{{{pastFinancialData}}}
+{{else}}
+(No past financial data provided for comparison)
+{{/if}}
 
-Risks:
-Opportunities:
-Recommendations:
-Summary:`,
+Structure your output clearly under the following headings: Summary, Potential Risks, Potential Opportunities, Recommendations.
+Be professional, insightful, and ensure your analysis is directly based on the data provided.`,
 });
 
 const budgetInsightsFlow = ai.defineFlow(
@@ -79,3 +89,4 @@ const budgetInsightsFlow = ai.defineFlow(
     return output!;
   }
 );
+
