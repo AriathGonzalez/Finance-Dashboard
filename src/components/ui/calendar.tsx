@@ -1,8 +1,10 @@
+
 "use client"
 
 import * as React from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { DayPicker } from "react-day-picker"
+import { getYear } from 'date-fns';
 
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
@@ -15,15 +17,26 @@ function Calendar({
   showOutsideDays = true,
   ...props
 }: CalendarProps) {
+  const currentYear = getYear(new Date());
+  // Use fromYear/toYear from props if provided, otherwise default to a range around the current year
+  const fromYear = props.fromYear ?? currentYear - 10;
+  const toYear = props.toYear ?? currentYear + 10;
+  // Default to dropdown-buttons layout if no specific captionLayout is passed
+  const captionLayout = props.captionLayout ?? "dropdown-buttons";
+
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
+      captionLayout={captionLayout}
+      fromYear={fromYear}
+      toYear={toYear}
       className={cn("p-3", className)}
       classNames={{
         months: "flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0",
         month: "space-y-4",
         caption: "flex justify-center pt-1 relative items-center",
-        caption_label: "text-sm font-medium",
+        caption_label: cn("text-sm font-medium", (captionLayout === "dropdown" || captionLayout === "dropdown-buttons") && "hidden"), // Hide default label when dropdowns are visible
+        caption_dropdowns: "flex gap-1", // Basic styling for dropdowns container
         nav: "space-x-1 flex items-center",
         nav_button: cn(
           buttonVariants({ variant: "outline" }),
@@ -46,7 +59,7 @@ function Calendar({
           "bg-primary text-primary-foreground hover:bg-primary hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
         day_today: "bg-accent text-accent-foreground",
         day_outside:
-          "day-outside text-muted-foreground aria-selected:bg-accent/50 aria-selected:text-muted-foreground",
+          "day-outside text-muted-foreground opacity-50 aria-selected:bg-accent/50 aria-selected:text-muted-foreground aria-selected:opacity-100", // Ensure outside selected days are visible enough
         day_disabled: "text-muted-foreground opacity-50",
         day_range_middle:
           "aria-selected:bg-accent aria-selected:text-accent-foreground",
@@ -54,11 +67,11 @@ function Calendar({
         ...classNames,
       }}
       components={{
-        IconLeft: ({ className, ...props }) => (
-          <ChevronLeft className={cn("h-4 w-4", className)} {...props} />
+        IconLeft: ({ ...iconProps }) => (
+          <ChevronLeft className={cn("h-4 w-4", iconProps.className)} {...iconProps} />
         ),
-        IconRight: ({ className, ...props }) => (
-          <ChevronRight className={cn("h-4 w-4", className)} {...props} />
+        IconRight: ({ ...iconProps }) => (
+          <ChevronRight className={cn("h-4 w-4", iconProps.className)} {...iconProps} />
         ),
       }}
       {...props}
