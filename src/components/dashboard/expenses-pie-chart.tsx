@@ -1,4 +1,3 @@
-
 "use client";
 
 import { Pie, PieChart, Tooltip, Legend, Cell } from "recharts";
@@ -76,7 +75,6 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-
 const months = [
   { value: 1, label: "January" },
   { value: 2, label: "February" },
@@ -106,7 +104,7 @@ export const ExpensesPieChart = forwardRef<HTMLDivElement>((_, ref) => {
     setIsClient(true);
     const currentDate = new Date();
     setSelectedMonth(getMonth(currentDate) + 1); // date-fns getMonth is 0-indexed
-    setSelectedYear(getYear(currentDate)); // Use current year by default
+    setSelectedYear(2023); // Use current year by default
   }, []);
 
   useEffect(() => {
@@ -149,7 +147,9 @@ export const ExpensesPieChart = forwardRef<HTMLDivElement>((_, ref) => {
                 errorData.message || errorData.error
               );
               // Ensure the key matches one of the expected keys in categoryConfigKeys
-              const errorCategoryKey = Object.keys(chartConfig)[index + 1] as (typeof categoryConfigKeys)[number];
+              const errorCategoryKey = Object.keys(chartConfig)[
+                index + 1
+              ] as (typeof categoryConfigKeys)[number];
               return {
                 [errorCategoryKey]: [{ total_expenses: 0 }],
               };
@@ -273,7 +273,7 @@ export const ExpensesPieChart = forwardRef<HTMLDivElement>((_, ref) => {
                       hideLabel
                       formatter={(value, name, props) => {
                         // Access the original category name from the payload
-                        const originalItem = props.payload as any; 
+                        const originalItem = props.payload as any;
                         return `${originalItem.category}: $${(
                           value as number
                         ).toLocaleString()}`;
@@ -311,4 +311,3 @@ export const ExpensesPieChart = forwardRef<HTMLDivElement>((_, ref) => {
 });
 
 ExpensesPieChart.displayName = "ExpensesPieChart";
-
