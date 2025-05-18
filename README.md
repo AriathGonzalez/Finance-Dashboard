@@ -20,7 +20,9 @@ A smart budgeting and financial dashboard built with cutting-edge tech. Track fi
 ## 📄 Pages
 
 - **Dashboard** – Overview of your finances (revenue, expenses, trends)
+    ![](https://github.com/AriathGonzalez/studio/blob/master/images/Screenshot%202025-05-18%20123942.png)
 - **Data Connections** - Connect to External Data End Points
+      ![](https://github.com/AriathGonzalez/studio/blob/master/images/Screenshot%202025-05-18%20121513.png)
 - **Analytics** – Charts and visualizations
   ![](https://github.com/AriathGonzalez/studio/blob/master/GIF/Data%20Visualizations.gif)
 - **Insights** – AI-generated suggestions for financial decisions
