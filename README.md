@@ -38,7 +38,7 @@ A smart budgeting and financial dashboard built with cutting-edge tech. Track fi
   Get smart suggestions for budget optimization, risk detection, and resource allocation.
 
 - **AI Chatbot**  
-  Powered by [diffy.ai](https://diffy.ai), ask questions and receive contextual answers.
+  Powered by [diffy.ai](https://github.com/langgenius/dify), ask questions and receive contextual answers.
 
 ---
 
