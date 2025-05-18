@@ -8,12 +8,12 @@ A smart budgeting and financial dashboard built with cutting-edge tech. Track fi
 
 ## 📚 Table of Contents
 
-- [Pages](#pages)
-- [Features](#features)
-- [Technologies Used](#technologies-used)
-- [Installation](#installation)
-- [Usage](#usage)
-- [API Endpoints](#api-endpoints)
+- [Pages](#-pages)
+- [Features](#-features)
+- [Technologies Used](#-technologies-used)
+- [Installation](#-installation)
+- [Usage](#-usage)
+- [API Endpoints](#-api-endpoints)
 
 ---
 
