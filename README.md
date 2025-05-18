@@ -59,7 +59,7 @@ A smart budgeting and financial dashboard built with cutting-edge tech. Track fi
 ## 🚀 Installation
 
 ```bash
-git clone https://github.com/AriathGonzalez/studio.git
+git clone https://github.com/AriathGonzalez/Finance-Dashboard.git
 cd studio
 npm install
 
